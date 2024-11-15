@@ -2,8 +2,8 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Servidor: localhost:3306
--- Tiempo de generación: 11-11-2024 a las 20:59:15
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 15-11-2024 a las 21:34:13
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.0.28
 
@@ -40,7 +40,7 @@ CREATE TABLE `curso` (
 INSERT INTO `curso` (`idCurso`, `anio`, `division`) VALUES
 (1, 7, 2),
 (2, 6, 2),
-(3, 3, 5);
+(3, 4, 5);
 
 -- --------------------------------------------------------
 
@@ -54,7 +54,6 @@ CREATE TABLE `formulario` (
   `gmail` varchar(45) DEFAULT NULL,
   `telefono` int(20) DEFAULT NULL,
   `direccion` varchar(45) DEFAULT NULL,
-  `empresa_pasantias` varchar(45) DEFAULT NULL,
   `anio_egreso` date DEFAULT NULL,
   `Tecnicatura_idTecnicatura` int(11) NOT NULL,
   `Curso_idCurso` int(11) NOT NULL,
@@ -69,8 +68,8 @@ CREATE TABLE `formulario` (
 
 CREATE TABLE `pasantias` (
   `idPasantias` int(11) NOT NULL,
-  `Nombre_empresa` varchar(100) NOT NULL,
-  `Tutor_idTutor` int(11) NOT NULL
+  `Nombre_Empresa` varchar(50) NOT NULL,
+  `tutor` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -91,19 +90,8 @@ CREATE TABLE `tecnicatura` (
 INSERT INTO `tecnicatura` (`idTecnicatura`, `nombre`) VALUES
 (1, 'Informatica'),
 (2, 'Maestro mayor de obra'),
-(3, 'Electro');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `tutor`
---
-
-CREATE TABLE `tutor` (
-  `idTutor` int(11) NOT NULL,
-  `Nombre` varchar(45) NOT NULL,
-  `n_telefono` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+(3, 'Electro'),
+(4, 'Electro');
 
 --
 -- Índices para tablas volcadas
@@ -120,28 +108,21 @@ ALTER TABLE `curso`
 --
 ALTER TABLE `formulario`
   ADD PRIMARY KEY (`idFormulario`),
-  ADD UNIQUE KEY `Tecnicatura_idTecnicatura` (`Tecnicatura_idTecnicatura`),
-  ADD UNIQUE KEY `Curso_idCurso` (`Curso_idCurso`),
-  ADD KEY `fk_Formulario_Pasantias` (`Pasantias_idPasantias`);
+  ADD KEY `fk_formulario_Tecnicatura` (`Tecnicatura_idTecnicatura`),
+  ADD KEY `fk_formulario_Curso` (`Curso_idCurso`),
+  ADD KEY `fk_formulario_pasantias` (`Pasantias_idPasantias`);
 
 --
 -- Indices de la tabla `pasantias`
 --
 ALTER TABLE `pasantias`
-  ADD PRIMARY KEY (`idPasantias`),
-  ADD UNIQUE KEY `Tutor_idTutor` (`Tutor_idTutor`);
+  ADD PRIMARY KEY (`idPasantias`);
 
 --
 -- Indices de la tabla `tecnicatura`
 --
 ALTER TABLE `tecnicatura`
   ADD PRIMARY KEY (`idTecnicatura`);
-
---
--- Indices de la tabla `tutor`
---
-ALTER TABLE `tutor`
-  ADD PRIMARY KEY (`idTutor`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -157,7 +138,7 @@ ALTER TABLE `curso`
 -- AUTO_INCREMENT de la tabla `formulario`
 --
 ALTER TABLE `formulario`
-  MODIFY `idFormulario` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `idFormulario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `pasantias`
@@ -169,13 +150,7 @@ ALTER TABLE `pasantias`
 -- AUTO_INCREMENT de la tabla `tecnicatura`
 --
 ALTER TABLE `tecnicatura`
-  MODIFY `idTecnicatura` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT de la tabla `tutor`
---
-ALTER TABLE `tutor`
-  MODIFY `idTutor` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `idTecnicatura` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Restricciones para tablas volcadas
@@ -185,15 +160,9 @@ ALTER TABLE `tutor`
 -- Filtros para la tabla `formulario`
 --
 ALTER TABLE `formulario`
-  ADD CONSTRAINT `fk_Formulario_Pasantias` FOREIGN KEY (`Pasantias_idPasantias`) REFERENCES `pasantias` (`idPasantias`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_formulario_Curso` FOREIGN KEY (`Curso_idCurso`) REFERENCES `curso` (`idCurso`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_formulario_Tecnicatura` FOREIGN KEY (`Tecnicatura_idTecnicatura`) REFERENCES `tecnicatura` (`idTecnicatura`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `pasantias`
---
-ALTER TABLE `pasantias`
-  ADD CONSTRAINT `fk_Pasantias_Tutor` FOREIGN KEY (`Tutor_idTutor`) REFERENCES `tutor` (`idTutor`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_formulario_Tecnicatura` FOREIGN KEY (`Tecnicatura_idTecnicatura`) REFERENCES `tecnicatura` (`idTecnicatura`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_formulario_pasantias` FOREIGN KEY (`Pasantias_idPasantias`) REFERENCES `pasantias` (`idPasantias`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
