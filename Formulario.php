@@ -1,17 +1,18 @@
 <?php
-// Database connection
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "bolsa_empleo";
 
+// Crear conexión
 $conn = new mysqli($servername, $username, $password, $dbname);
 
+// Verificar la conexión
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Function to sanitize input
+// Función para sanitizar input
 function sanitize_input($data) {
     $data = trim($data);
     $data = stripslashes($data);
@@ -19,32 +20,42 @@ function sanitize_input($data) {
     return $data;
 }
 
-// Handle form submission
+// Manejar el envío del formulario
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nombre_apellido = sanitize_input($_POST['nombreApellido']);
-    $direccion = sanitize_input($_POST['direccion']);
-    $correo = sanitize_input($_POST['correo']);
+    $gmail = sanitize_input($_POST['correo']);
     $telefono = sanitize_input($_POST['telefono']);
+    $direccion = sanitize_input($_POST['direccion']);
     $anio_egreso = sanitize_input($_POST['anoEgreso']);
-    $curso_id = sanitize_input($_POST['curso']);
     $tecnicatura_id = sanitize_input($_POST['tecnicatura']);
-    $empresa_pasantias = sanitize_input($_POST['empresaPasantias']);
-    $mentor_id = sanitize_input($_POST['mentor']);
+    $curso_id = sanitize_input($_POST['curso']);
+    $pasantia_id = sanitize_input($_POST['empresaPasantias']);
 
-    // Insert data into the formulario table
-    $sql = "INSERT INTO formulario (nombre_apellido, gmail, telefono, direccion, empresa_pasantias, anio_egreso, Tecnicatura_idTecnicatura, Curso_idCurso, Pasantias_idPasantias) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    // Convert año_egreso to DATE format
+    $anio_egreso = date('Y-m-d', strtotime("$anio_egreso-01-01"));
+
+    // Preparar la consulta SQL
+    $sql = "INSERT INTO formulario (nombre_apellido, gmail, telefono, direccion, anio_egreso, Tecnicatura_idTecnicatura, Curso_idCurso, Pasantias_idPasantias) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssisssiii", $nombre_apellido, $correo, $telefono, $direccion, $empresa_pasantias, $anio_egreso, $tecnicatura_id, $curso_id, $empresa_pasantias);
-    
-    if ($stmt->execute()) {
-        echo "<script>alert('Registro exitoso!');</script>";
+    // Preparar y vincular parámetros
+    if ($stmt = $conn->prepare($sql)) {
+        $stmt->bind_param("ssssssii", $nombre_apellido, $gmail, $telefono, $direccion, $anio_egreso, $tecnicatura_id, $curso_id, $pasantia_id);
+        
+        // Ejecutar la consulta
+        if ($stmt->execute()) {
+            echo "<script>
+                    alert('Registro exitoso!');
+                    window.location.href = 'index.php';
+                  </script>";
+        } else {
+            echo "<script>alert('Error al registrar: " . $stmt->error . "');</script>";
+        }
+
+        $stmt->close();
     } else {
-        echo "<script>alert('Error al registrar: " . $stmt->error . "');</script>";
+        echo "<script>alert('Error en la preparación de la consulta: " . $conn->error . "');</script>";
     }
-
-    $stmt->close();
 }
 
 // Fetch data for dropdowns
@@ -52,6 +63,11 @@ $cursos = $conn->query("SELECT * FROM curso");
 $tecnicaturas = $conn->query("SELECT * FROM tecnicatura");
 $empresas = $conn->query("SELECT * FROM pasantias");
 $tutores = $conn->query("SELECT * FROM tutor");
+
+$tutores = $conn->query("SELECT * FROM pasantias");
+if (!$tutores) {
+    die("Error fetching tutors: " . $conn->error);
+}
 
 $conn->close();
 ?>
@@ -204,10 +220,10 @@ $conn->close();
 
                     <div class="form-floating mb-3">
                         <select class="form-select" id="empresaPasantias" name="empresaPasantias" required>
-                            <option value="">Seleccionar empresa</option>
-                            <?php while($row = $empresas->fetch_assoc()) { ?>
-                                <option value="<?php echo $row['idPasantias']; ?>"><?php echo $row['Nombre_empresa']; ?></option>
-                            <?php } ?>
+                        <option value="">Seleccionar empresa</option>
+                        <?php while($row = $empresas->fetch_assoc()) { ?>
+                            <option value="<?php echo $row['idPasantias']; ?>"><?php echo $row['Nombre_Empresa']; ?></option>
+                        <?php } ?>
                         </select>
                         <label for="empresaPasantias">Empresa Pasantías</label>
                     </div>
@@ -216,14 +232,16 @@ $conn->close();
                         <select class="form-select" id="mentor" name="mentor" required>
                             <option value="">Seleccionar mentor</option>
                             <?php while($row = $tutores->fetch_assoc()) { ?>
-                                <option value="<?php echo $row['idTutor']; ?>"><?php echo $row['Nombre']; ?></option>
+                                <option value="<?php echo $row['idPasantias']; ?>"><?php echo $row['tutor']; ?></option>
                             <?php } ?>
                         </select>
                         <label for="mentor">Mentor</label>
                     </div>
 
                     <div class="enviar-boton text-center mb-3">
-                        <button type="submit" class="enviar-button mt-4">Enviar</button>
+                        <a href="index.php" class="enviar-button mt-4">Enviar</a>
+                        <button class="navbar-toggler pe-0" type="submit" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
                     </div>
                 </div>
             </div>

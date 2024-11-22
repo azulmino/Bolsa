@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 15-11-2024 a las 21:34:13
+-- Tiempo de generación: 15-11-2024 a las 22:02:41
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.0.28
 
@@ -69,7 +69,8 @@ CREATE TABLE `formulario` (
 CREATE TABLE `pasantias` (
   `idPasantias` int(11) NOT NULL,
   `Nombre_Empresa` varchar(50) NOT NULL,
-  `tutor` varchar(50) NOT NULL
+  `tutor` varchar(50) NOT NULL,
+  `telefono` int(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
