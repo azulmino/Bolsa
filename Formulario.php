@@ -239,7 +239,7 @@ $conn->close();
                     </div>
 
                     <div class="enviar-boton text-center mb-3">
-                        <a href="index.php" class="enviar-button mt-4">Enviar</a>
+                        <a type="summit" href="index.php" class="enviar-button mt-4">Enviar</a>
                         <button class="navbar-toggler pe-0" type="submit" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </div>
